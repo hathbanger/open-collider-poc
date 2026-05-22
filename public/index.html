@@ -239,6 +239,138 @@
     letter-spacing: 1px;
   }
 
+  /* ── COLLIDER LOADING ANIMATION ── */
+  .collider-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 32px;
+  }
+
+  .collider-anim {
+    position: relative;
+    width: 120px;
+    height: 120px;
+  }
+
+  /* Orbital rings */
+  .orbit {
+    position: absolute;
+    inset: 0;
+    border: 1px solid rgba(255,79,0,0.15);
+    border-radius: 50%;
+    animation: pulse-ring 2s ease-in-out infinite;
+  }
+
+  .orbit:nth-child(2) {
+    inset: 15px;
+    border-color: rgba(0,204,102,0.12);
+    animation-delay: 0.5s;
+  }
+
+  .orbit:nth-child(3) {
+    inset: 30px;
+    border-color: rgba(255,79,0,0.08);
+    animation-delay: 1s;
+  }
+
+  @keyframes pulse-ring {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.08); opacity: 1; }
+  }
+
+  /* Two particles orbiting */
+  .particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    margin: -4px 0 0 -4px;
+  }
+
+  .particle-a {
+    background: #FF4F00;
+    box-shadow: 0 0 12px rgba(255,79,0,0.6), 0 0 24px rgba(255,79,0,0.3);
+    animation: orbit-a 2.4s linear infinite;
+  }
+
+  .particle-b {
+    background: #00CC66;
+    box-shadow: 0 0 12px rgba(0,204,102,0.6), 0 0 24px rgba(0,204,102,0.3);
+    animation: orbit-b 2.4s linear infinite;
+  }
+
+  @keyframes orbit-a {
+    0% { transform: rotate(0deg) translateX(44px) rotate(0deg); }
+    100% { transform: rotate(360deg) translateX(44px) rotate(-360deg); }
+  }
+
+  @keyframes orbit-b {
+    0% { transform: rotate(180deg) translateX(44px) rotate(-180deg); }
+    100% { transform: rotate(540deg) translateX(44px) rotate(-540deg); }
+  }
+
+  /* Center glow on collision */
+  .core-glow {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    top: 50%;
+    left: 50%;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    background: #FF4F00;
+    animation: core-pulse 1.2s ease-in-out infinite;
+  }
+
+  @keyframes core-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.3; box-shadow: 0 0 8px rgba(255,79,0,0.3); }
+    50% { transform: scale(2.5); opacity: 0.8; box-shadow: 0 0 20px rgba(255,79,0,0.6), 0 0 40px rgba(255,79,0,0.2); }
+  }
+
+  /* Spark burst at collision points */
+  .spark {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #FF4F00;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    animation: spark-fly 2.4s linear infinite;
+    opacity: 0;
+  }
+
+  .spark:nth-child(6) { animation-delay: 0s; --angle: 30deg; --dist: 55px; }
+  .spark:nth-child(7) { animation-delay: 0.1s; --angle: 150deg; --dist: 45px; background: #00CC66; }
+  .spark:nth-child(8) { animation-delay: 0.2s; --angle: 270deg; --dist: 50px; }
+  .spark:nth-child(9) { animation-delay: 1.2s; --angle: 90deg; --dist: 48px; background: #00CC66; }
+  .spark:nth-child(10) { animation-delay: 1.3s; --angle: 210deg; --dist: 52px; }
+  .spark:nth-child(11) { animation-delay: 1.4s; --angle: 330deg; --dist: 46px; background: #00CC66; }
+
+  @keyframes spark-fly {
+    0%, 45% { opacity: 0; transform: translate(0,0); }
+    50% { opacity: 1; transform: translate(0,0); }
+    70% { opacity: 0.8; transform: rotate(var(--angle)) translateX(var(--dist)); }
+    100% { opacity: 0; transform: rotate(var(--angle)) translateX(var(--dist)); }
+  }
+
+  .collider-text {
+    color: #555;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .collider-text::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+
   .results-scroll {
     flex: 1;
     overflow-y: auto;
@@ -415,6 +547,25 @@
     </div>
 
     <div class="empty-state" id="emptyState">click a brief to collide</div>
+
+    <div class="collider-loading" id="loadingAnim" style="display:none">
+      <div class="collider-anim">
+        <div class="orbit"></div>
+        <div class="orbit"></div>
+        <div class="orbit"></div>
+        <div class="particle particle-a"></div>
+        <div class="particle particle-b"></div>
+        <div class="core-glow"></div>
+        <div class="spark"></div>
+        <div class="spark"></div>
+        <div class="spark"></div>
+        <div class="spark"></div>
+        <div class="spark"></div>
+        <div class="spark"></div>
+      </div>
+      <div class="collider-text" id="loadingText">colliding domains</div>
+    </div>
+
     <div class="results-scroll" id="results" style="display:none"></div>
   </div>
 
@@ -486,13 +637,18 @@ async function collide(brief) {
   const results = document.getElementById('results');
   const empty = document.getElementById('emptyState');
 
+  const loading = document.getElementById('loadingAnim');
+  const loadingText = document.getElementById('loadingText');
+
   label.style.display = 'inline';
   text.textContent = brief;
   empty.style.display = 'none';
-  results.style.display = 'block';
+  results.style.display = 'none';
   results.innerHTML = '';
+  loading.style.display = 'flex';
+  loadingText.textContent = 'generating distant domains';
   domains = [];
-  status.innerHTML = '<span class="loading-dots">Generating distant domains</span>';
+  status.textContent = '';
 
   try {
     const res = await fetch('/api/collide', {
@@ -535,10 +691,18 @@ function handleEvent(msg) {
 
   if (msg.type === 'domains') {
     domains = msg.domains;
-    status.innerHTML = `<span class="loading-dots">${domains.length} domains found — generating collisions</span>`;
+    const loadingText = document.getElementById('loadingText');
+    loadingText.textContent = `${domains.length} domains found — colliding`;
   }
 
   if (msg.type === 'domain_start') {
+    // First domain arriving = hide loading, show results
+    const loading = document.getElementById('loadingAnim');
+    if (loading.style.display !== 'none') {
+      loading.style.display = 'none';
+      results.style.display = 'block';
+    }
+
     const domain = domains.find(d => d.name === msg.domain);
     if (!domain) return;
 
