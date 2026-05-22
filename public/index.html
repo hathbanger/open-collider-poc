@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Collider</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0A0A0A;
+    color: #E0E0E0;
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  header {
+    margin-bottom: 48px;
+  }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #FF4F00;
+    margin-bottom: 8px;
+  }
+
+  h1 span { color: #555; }
+
+  .tagline {
+    color: #666;
+    font-size: 13px;
+  }
+
+  .input-section {
+    margin-bottom: 40px;
+  }
+
+  label {
+    display: block;
+    color: #888;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .examples-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .example-btn {
+    background: #111;
+    border: 1px solid #2A2A2A;
+    color: #777;
+    font-family: inherit;
+    font-size: 11px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+    line-height: 1.4;
+  }
+
+  .example-btn:hover {
+    border-color: #FF4F00;
+    color: #E0E0E0;
+    background: #1A1A1A;
+  }
+
+  .regen-btn {
+    background: none;
+    border: 1px solid #2A2A2A;
+    color: #555;
+    font-family: inherit;
+    font-size: 11px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .regen-btn:hover {
+    border-color: #FF4F00;
+    color: #FF4F00;
+  }
+
+  .regen-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .regen-btn .regen-icon {
+    font-size: 14px;
+    display: inline-block;
+    transition: transform 0.4s;
+  }
+
+  .regen-btn.spinning .regen-icon {
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .examples-grid.fading .example-btn {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+
+  .example-btn.fade-in {
+    animation: fadeUp 0.3s ease forwards;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  textarea {
+    width: 100%;
+    background: #111;
+    border: 1px solid #333;
+    color: #E0E0E0;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 16px;
+    resize: vertical;
+    min-height: 100px;
+    outline: none;
+  }
+
+  textarea:focus { border-color: #FF4F00; }
+
+  .btn {
+    background: #FF4F00;
+    color: #0A0A0A;
+    border: none;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px 32px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 16px;
+    transition: opacity 0.15s;
+  }
+
+  .btn:hover { opacity: 0.85; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .status {
+    color: #FF4F00;
+    font-size: 13px;
+    margin-top: 16px;
+    min-height: 20px;
+  }
+
+  .status::before {
+    content: '> ';
+    color: #555;
+  }
+
+  .status:empty::before { content: ''; }
+
+  .results { margin-top: 32px; }
+
+  .domain-block {
+    margin-bottom: 40px;
+    border-left: 2px solid #00CC66;
+    padding-left: 20px;
+  }
+
+  .domain-header {
+    margin-bottom: 16px;
+  }
+
+  .domain-name {
+    color: #00CC66;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .domain-principle {
+    color: #999;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .domain-question {
+    color: #666;
+    font-size: 12px;
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  .idea-card {
+    background: #111;
+    border: 1px solid #222;
+    padding: 20px;
+    margin-bottom: 12px;
+    position: relative;
+  }
+
+  .idea-name {
+    color: #FF4F00;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .idea-mechanism {
+    color: #BBB;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .idea-attribution {
+    color: #555;
+    font-size: 11px;
+  }
+
+  .idea-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .idea-actions button {
+    background: none;
+    border: 1px solid #333;
+    color: #888;
+    font-family: inherit;
+    font-size: 16px;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .idea-actions button:hover { border-color: #666; color: #E0E0E0; }
+  .idea-actions button.active-love { border-color: #FF4F00; color: #FF4F00; background: rgba(255,79,0,0.1); }
+  .idea-actions button.active-like { border-color: #00CC66; color: #00CC66; background: rgba(0,204,102,0.1); }
+  .idea-actions button.active-trash { border-color: #666; color: #666; background: rgba(102,102,102,0.1); }
+  .idea-actions button.active-trash + .idea-card-wrap { opacity: 0.4; }
+
+  .idea-card.trashed { opacity: 0.3; }
+
+  .loading-dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+  }
+
+  @keyframes dots {
+    0% { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+  }
+
+  footer {
+    margin-top: 80px;
+    padding-top: 20px;
+    border-top: 1px solid #1A1A1A;
+    color: #333;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 24px 16px; }
+    h1 { font-size: 22px; }
+    textarea { font-size: 13px; padding: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>OPEN COLLIDER <span>/ POC</span></h1>
+    <div class="tagline">bisociation engine — collide distant domains with your problem</div>
+  </header>
+
+  <div class="input-section">
+    <label>ideation brief</label>
+    <div class="examples-grid" id="examples">
+      <button class="example-btn" onclick="useBrief(this)">New ways to onboard users to a crypto wallet</button>
+      <button class="example-btn" onclick="useBrief(this)">How to make code review less soul-crushing</button>
+      <button class="example-btn" onclick="useBrief(this)">Redesign the job interview to actually predict performance</button>
+      <button class="example-btn" onclick="useBrief(this)">Make a CLI tool go viral with non-technical users</button>
+      <button class="example-btn" onclick="useBrief(this)">Break users out of their Spotify taste bubble</button>
+      <button class="example-btn" onclick="useBrief(this)">Reduce no-shows for medical appointments by 80%</button>
+      <button class="example-btn" onclick="useBrief(this)">Make open-source contributors stay past their first PR</button>
+      <button class="example-btn" onclick="useBrief(this)">Design a loyalty program that doesn't feel like a scam</button>
+      <button class="example-btn" onclick="useBrief(this)">Get teenagers to care about personal finance</button>
+      <button class="example-btn" onclick="useBrief(this)">Reinvent the conference talk format for the AI era</button>
+      <button class="example-btn" onclick="useBrief(this)">Make paying with AI agents feel trustworthy</button>
+      <button class="example-btn" onclick="useBrief(this)">Fix the cold-start problem for a two-sided marketplace</button>
+      <button class="example-btn" onclick="useBrief(this)">Design a city park that reduces loneliness</button>
+      <button class="example-btn" onclick="useBrief(this)">Make reading long-form content addictive again</button>
+      <button class="example-btn" onclick="useBrief(this)">Build a developer community that doesn't die after launch</button>
+      <button class="example-btn" onclick="useBrief(this)">How to teach math without anyone realizing they're learning math</button>
+      <button class="example-btn" onclick="useBrief(this)">Design a voting system resistant to polarization</button>
+      <button class="example-btn" onclick="useBrief(this)">Make enterprise software feel like a consumer app</button>
+      <button class="example-btn" onclick="useBrief(this)">Reinvent the restaurant menu for dietary restrictions</button>
+      <button class="example-btn" onclick="useBrief(this)">Get people to actually use their gym membership</button>
+    </div>
+    <button class="regen-btn" id="regenBtn" onclick="regenExamples()" title="Regenerate examples">
+      <span class="regen-icon">↻</span> NEW BRIEFS
+    </button>
+    <textarea id="brief" placeholder="e.g. New ways to onboard users to a crypto wallet"></textarea>
+    <button class="btn" id="collideBtn" onclick="collide()">COLLIDE</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="results" id="results"></div>
+
+  <footer>open collider poc — bisociation engine</footer>
+</div>
+
+<script>
+let domains = [];
+
+function useBrief(btn) {
+  document.getElementById('brief').value = btn.textContent;
+  collide();
+}
+
+async function regenExamples() {
+  const btn = document.getElementById('regenBtn');
+  const grid = document.getElementById('examples');
+
+  btn.disabled = true;
+  btn.classList.add('spinning');
+
+  // Fade out current buttons
+  grid.classList.add('fading');
+
+  try {
+    const res = await fetch('/api/regen-examples', { method: 'POST' });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    // Wait for fade out
+    await new Promise(r => setTimeout(r, 250));
+
+    // Replace buttons
+    grid.innerHTML = '';
+    grid.classList.remove('fading');
+
+    data.briefs.forEach((brief, i) => {
+      const b = document.createElement('button');
+      b.className = 'example-btn fade-in';
+      b.textContent = brief;
+      b.onclick = () => useBrief(b);
+      b.style.animationDelay = `${i * 40}ms`;
+      grid.appendChild(b);
+    });
+  } catch (err) {
+    console.error('Regen error:', err);
+    grid.classList.remove('fading');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('spinning');
+  }
+}
+
+async function collide() {
+  const brief = document.getElementById('brief').value.trim();
+  if (!brief) return;
+
+  const btn = document.getElementById('collideBtn');
+  const status = document.getElementById('status');
+  const results = document.getElementById('results');
+
+  btn.disabled = true;
+  results.innerHTML = '';
+  domains = [];
+  status.innerHTML = '<span class="loading-dots">Generating distant domains</span>';
+
+  try {
+    const res = await fetch('/api/collide', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brief }),
+    });
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (!raw || raw === '[DONE]') continue;
+
+        try {
+          const msg = JSON.parse(raw);
+          handleEvent(msg);
+        } catch (e) {}
+      }
+    }
+  } catch (err) {
+    status.textContent = `Error: ${err.message}`;
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function handleEvent(msg) {
+  const status = document.getElementById('status');
+  const results = document.getElementById('results');
+
+  switch (msg.type) {
+    case 'status':
+      status.innerHTML = `<span class="loading-dots">${msg.message}</span>`;
+      break;
+
+    case 'domains':
+      domains = msg.domains;
+      for (let i = 0; i < domains.length; i++) {
+        const d = domains[i];
+        const block = document.createElement('div');
+        block.className = 'domain-block';
+        block.id = `domain-${i}`;
+        block.innerHTML = `
+          <div class="domain-header">
+            <div class="domain-name">${esc(d.domain)}</div>
+            <div class="domain-principle">⚡ ${esc(d.active_principle)}</div>
+            <div class="domain-question">${esc(d.bridging_question)}</div>
+          </div>
+          <div class="ideas" id="ideas-${i}"></div>
+        `;
+        results.appendChild(block);
+      }
+      break;
+
+    case 'collision':
+      const container = document.getElementById(`ideas-${msg.domainIndex}`);
+      if (!container) break;
+      for (const idea of msg.ideas) {
+        const card = document.createElement('div');
+        card.className = 'idea-card';
+        const id = `idea-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+        card.id = id;
+        card.innerHTML = `
+          <div class="idea-name">${esc(idea.name)}</div>
+          <div class="idea-mechanism">${esc(idea.mechanism)}</div>
+          <div class="idea-attribution">${esc(idea.attribution)}</div>
+          <div class="idea-actions">
+            <button onclick="rate('${id}','love',this)" title="Love">❤️</button>
+            <button onclick="rate('${id}','like',this)" title="Like">👍</button>
+            <button onclick="rate('${id}','trash',this)" title="Trash">🗑️</button>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+      break;
+
+    case 'done':
+      status.textContent = 'Collision complete.';
+      break;
+
+    case 'error':
+      status.textContent = `Error: ${msg.message}`;
+      break;
+  }
+}
+
+function rate(cardId, rating, btn) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+
+  // Clear all active states in this card
+  card.querySelectorAll('.idea-actions button').forEach(b => {
+    b.className = '';
+  });
+
+  // Toggle
+  const wasActive = btn.classList.contains(`active-${rating}`);
+  if (!wasActive) {
+    btn.classList.add(`active-${rating}`);
+    card.classList.toggle('trashed', rating === 'trash');
+  } else {
+    card.classList.remove('trashed');
+  }
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
