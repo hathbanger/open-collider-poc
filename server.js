@@ -113,6 +113,10 @@ Return ONLY a JSON array: [{"name": "...", "mechanism": "...", "attribution": ".
 
 app.post('/api/regen-examples', async (c) => {
   try {
+    const { motif } = await c.req.json().catch(() => ({}));
+    const motifClause = motif
+      ? `\n\nMOTIF CONSTRAINT: Every brief must be colored by the motif "${motif}". The motif is a thematic lens — it shapes the *energy* and *angle* of the briefs, not their literal subject. Don't mention the motif word directly in the briefs. Let it seep into the framing, the tension, the way the problem is posed.`
+      : '';
     const res = await llmCall([{
       role: 'user',
       content: `Generate 20 provocative, diverse ideation briefs for a bisociation/creativity engine. Each brief should be a single sentence — a real problem worth solving or a design challenge worth exploring.
@@ -123,7 +127,7 @@ Rules:
 - Make them punchy and specific — not vague or generic
 - Some should be contrarian or uncomfortable
 - Some should be playful/fun
-- All should make someone think "ooh I want to see what the collider does with THAT"
+- All should make someone think "ooh I want to see what the collider does with THAT"${motifClause}
 
 Return ONLY a JSON array of 20 strings.`
     }], { stream: false });

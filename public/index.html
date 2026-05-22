@@ -54,6 +54,44 @@
     margin-bottom: 8px;
   }
 
+  .motif-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .motif-label {
+    color: #FF4F00;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
+
+  .motif-input {
+    flex: 1;
+    background: #111;
+    border: 1px solid #2A2A2A;
+    border-bottom: 2px solid #FF4F00;
+    color: #FF4F00;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .motif-input::placeholder {
+    color: #444;
+    font-style: italic;
+  }
+
+  .motif-input:focus {
+    border-color: #FF4F00;
+    border-bottom-color: #FF4F00;
+  }
+
   .examples-grid {
     display: flex;
     flex-wrap: wrap;
@@ -308,6 +346,10 @@
 
   <div class="input-section">
     <label>ideation brief</label>
+    <div class="motif-row">
+      <span class="motif-label">MOTIF /</span>
+      <input type="text" id="motif" class="motif-input" placeholder="decay, rebellion, fermentation, gravity, contagion..." />
+    </div>
     <div class="examples-grid" id="examples">
       <button class="example-btn" onclick="useBrief(this)">New ways to onboard users to a crypto wallet</button>
       <button class="example-btn" onclick="useBrief(this)">How to make code review less soul-crushing</button>
@@ -346,6 +388,12 @@
 <script>
 let domains = [];
 
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('motif').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); regenExamples(); }
+  });
+});
+
 function useBrief(btn) {
   document.getElementById('brief').value = btn.textContent;
   collide();
@@ -362,7 +410,12 @@ async function regenExamples() {
   grid.classList.add('fading');
 
   try {
-    const res = await fetch('/api/regen-examples', { method: 'POST' });
+    const motif = document.getElementById('motif').value.trim();
+    const res = await fetch('/api/regen-examples', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ motif: motif || undefined }),
+    });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
 
