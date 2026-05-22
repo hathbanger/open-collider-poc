@@ -447,20 +447,20 @@
   }
 
   .idea-name {
-    color: #FF4F00;
+    color: #e0a070;
     font-size: 14px;
     font-weight: 700;
     margin-bottom: 8px;
   }
 
   .idea-mechanism {
-    color: #BBB;
+    color: #999;
     font-size: 13px;
     margin-bottom: 8px;
   }
 
   .idea-attribution {
-    color: #555;
+    color: #444;
     font-size: 11px;
   }
 
@@ -534,6 +534,12 @@
       <input type="text" id="motif" class="motif-input" placeholder="sharks, decay, rebellion..." />
     </div>
 
+    <div class="regen-row">
+      <button class="regen-btn" id="regenBtn" onclick="regenExamples()" title="Regenerate examples">
+        <span class="regen-icon">↻</span> NEW BRIEFS
+      </button>
+    </div>
+
     <div class="briefs-scroll">
       <div class="examples-grid" id="examples">
         <button class="example-btn" onclick="useBrief(this)">crypto wallet onboarding</button>
@@ -559,11 +565,6 @@
       </div>
     </div>
 
-    <div class="regen-row">
-      <button class="regen-btn" id="regenBtn" onclick="regenExamples()" title="Regenerate examples">
-        <span class="regen-icon">↻</span> NEW BRIEFS
-      </button>
-    </div>
   </div>
 
   <!-- RIGHT PANEL -->
