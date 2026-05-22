@@ -109,18 +109,17 @@
   .example-btn {
     background: transparent;
     border: none;
-    color: #aaa;
+    color: #ccc;
     font-family: inherit;
-    font-size: 12px;
-    font-weight: 800;
-    padding: 2px 0;
+    font-size: 14px;
+    font-weight: 900;
+    padding: 1px 0;
     cursor: pointer;
     transition: color 0.15s;
-    line-height: 1.1;
+    line-height: 1.05;
     width: 100%;
     text-align: left;
     white-space: nowrap;
-    overflow: hidden;
     display: block;
   }
 
@@ -606,17 +605,26 @@ function fitBriefFonts() {
   const grid = document.getElementById('examples');
   if (!grid) return;
   const containerWidth = grid.clientWidth;
+  if (containerWidth < 10) return; // not laid out yet
+
+  // Hidden measurement element
+  const ruler = document.createElement('span');
+  ruler.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font-weight:900;font-family:inherit;';
+  document.body.appendChild(ruler);
+
   grid.querySelectorAll('.example-btn').forEach(btn => {
-    // Binary search for largest font that fits
-    let lo = 8, hi = 120;
+    ruler.textContent = btn.textContent;
+    let lo = 10, hi = 120;
     while (lo < hi) {
       const mid = Math.ceil((lo + hi) / 2);
-      btn.style.fontSize = mid + 'px';
-      if (btn.scrollWidth <= containerWidth) lo = mid;
+      ruler.style.fontSize = mid + 'px';
+      if (ruler.offsetWidth <= containerWidth) lo = mid;
       else hi = mid - 1;
     }
     btn.style.fontSize = lo + 'px';
   });
+
+  document.body.removeChild(ruler);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
